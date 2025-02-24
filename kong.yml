@@ -1,0 +1,27 @@
+_format_version: "2.1"
+
+services:
+  - name: authentication-service
+    url: http://host.docker.internal:8080
+    routes:
+      - name: auth
+        paths:
+          - /auth
+  - name: asset-service
+    url: http://host.docker.internal:8081
+    routes:
+      - name: asset
+        paths:
+          - /asset-service
+  - name: cdn-service
+    url: http://host.docker.internal:8181
+    routes:
+      - name: image-upload
+        paths:
+          - /cdn-service
+plugins:
+  - name: rate-limiting
+    service: asset-service
+    config:
+      minute: 5
+      policy: local
