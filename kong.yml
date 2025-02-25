@@ -24,4 +24,11 @@ plugins:
     service: asset-service
     config:
       minute: 5
-      policy: local
+      policy: redis
+      redis:
+        host: host.docker.internal
+        port: 6379
+        timeout: 2000
+      limit_by: consumer
+      fault_tolerant: true
+      hide_client_headers: false

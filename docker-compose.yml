@@ -12,6 +12,9 @@ services:
       - KONG_PROXY_ERROR_LOG=/dev/stderr
       - KONG_ADMIN_ERROR_LOG=/dev/stderr
       - KONG_ADMIN_LISTEN=0.0.0.0:8001, 0.0.0.0:8444 ssl
+      - KONG_RATE_LIMITING_REDIS_HOST=host.docker.internal
+      - KONG_RATE_LIMITING_REDIS_PORT=6379
+      - KONG_RATE_LIMITING_REDIS_TIMEOUT=2000
     ports:
       - "8000:8000"
       - "8443:8443"
