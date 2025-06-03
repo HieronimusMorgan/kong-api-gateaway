@@ -1,34 +1,665 @@
-_format_version: "2.1"
+_format_version: "3.0"
 
+# Services Configuration
 services:
+  # Authentication Service
   - name: authentication-service
     url: http://host.docker.internal:8080
+    connect_timeout: 5000     # Reduced from 10000
+    write_timeout: 5000       # Reduced from 10000
+    read_timeout: 5000        # Reduced from 10000
+    retries: 2                # Reduced from 3
     routes:
-      - name: auth
+      # Public Authentication Routes
+      - name: auth-public
         paths:
-          - /auth
+          - /v1/register
+          - /v1/login
+          - /v1/login-phone
+          - /v1/change-device
+          - /v1/verify-device
+        methods:
+          - POST
+        strip_path: false
+        
+      # Previously Protected Authentication Routes (Now Open)
+      - name: auth-protected
+        paths:
+          - /v1/register-device-token
+          - /v1/credential-key
+          - /v1/verify-pin
+          - /v1/change-password
+          - /v1/change-pin
+          - /v1/forget-pin
+          - /v1/logout
+          - /v1/refresh-token
+          - /v1/profile
+        methods:
+          - GET
+          - POST
+          - PUT
+        strip_path: false
+        
+      # User Profile Management
+      - name: auth-user-profile
+        paths:
+          - /v1/update/profile-name
+          - /v1/update/profile-photo
+          - /v1/update/user-setting
+          - /v1/delete-user
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Admin Authentication Routes
+      - name: auth-admin
+        paths:
+          - /v1/users
+          - /v1/user/update-role
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Resource Management (Admin)
+      - name: auth-resources
+        paths:
+          - /v1/resources
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Role Management (Admin)
+      - name: auth-roles
+        paths:
+          - /v1/role
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+    tags:
+      - authentication
+      - core-service
+
+  # Asset Management Service
   - name: asset-service
     url: http://host.docker.internal:8081
+    connect_timeout: 8000     # Reduced from 15000
+    write_timeout: 15000      # Reduced from 30000
+    read_timeout: 15000       # Reduced from 30000
+    retries: 1                # Reduced from 2
     routes:
-      - name: asset
+      # Asset Category Management
+      - name: asset-category
         paths:
-          - /asset-service
+          - /v1/asset-category
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Asset Group Management
+      - name: asset-group
+        paths:
+          - /v1/asset-group
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Asset Group Assets
+      - name: asset-group-asset
+        paths:
+          - /v1/asset-group/asset
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Asset Group Permissions
+      - name: asset-group-permission
+        paths:
+          - /v1/asset-group/permission
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Asset Group Members
+      - name: asset-group-member
+        paths:
+          - /v1/asset-group/member
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Asset Group Invitations
+      - name: asset-group-invitation
+        paths:
+          - /v1/asset-group/invitation
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Admin Asset Group Management
+      - name: asset-admin-group
+        paths:
+          - /v1/admin/asset-group
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Asset Maintenance Records
+      - name: asset-maintenance-record
+        paths:
+          - /v1/asset-maintenance-record
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Asset Maintenance
+      - name: asset-maintenance
+        paths:
+          - /v1/asset-maintenance
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Asset Maintenance Types
+      - name: asset-maintenance-type
+        paths:
+          - /v1/asset-maintenance-type
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Asset Management
+      - name: asset-management
+        paths:
+          - /v1/asset
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Asset Status
+      - name: asset-status
+        paths:
+          - /v1/asset-status
+          - /assets-service/v1/assets/status
+        methods:
+          - GET
+          - POST
+          - PUT
+        strip_path: false
+        
+      # Asset Wishlist
+      - name: asset-wishlist
+        paths:
+          - /v1/asset-wishlist
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+    tags:
+      - asset-management
+      - business-service
+
+  # Password Management Service
+  - name: password-management
+    url: http://host.docker.internal:8082
+    connect_timeout: 5000     # Reduced from 10000
+    write_timeout: 5000       # Reduced from 10000
+    read_timeout: 5000        # Reduced from 10000
+    retries: 2                # Keep as is for security
+    routes:
+      # Password Entry Management
+      - name: password-entry
+        paths:
+          - /v1/entry
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Password Group Management
+      - name: password-group
+        paths:
+          - /v1/group
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        
+      # Password Tag Management
+      - name: password-tag
+        paths:
+          - /v1/tag
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+    tags:
+      - password-management
+      - security-service
+
+  # CDN Service
   - name: cdn-service
     url: http://host.docker.internal:8181
+    connect_timeout: 10000    # Reduced from 20000
+    write_timeout: 30000      # Reduced from 60000
+    read_timeout: 30000       # Reduced from 60000
+    retries: 1                # Reduced from 2
     routes:
-      - name: image-upload
+      # Public CDN Access
+      - name: cdn-public
         paths:
-          - /cdn-service
+          - /v1/cdn
+        methods:
+          - GET
+        strip_path: false
+        
+      # File Upload
+      - name: cdn-upload
+        paths:
+          - /v1/upload-photo-profile
+          - /v1/upload
+        methods:
+          - POST
+        strip_path: false
+    tags:
+      - cdn
+      - file-service
+
+# Performance-Optimized Global Plugins
 plugins:
-  - name: rate-limiting
-    service: asset-service
+  # Security Plugins
+  - name: cors
     config:
-      minute: 5
+      origins:
+        - "https://yourdomain.com"
+        - "https://app.yourdomain.com"
+        - "http://localhost:3000"
+        - "http://localhost:3001"
+        - "*"  # For development - remove in production
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - PATCH
+        - OPTIONS
+        - HEAD
+      headers:
+        - Accept
+        - Accept-Version
+        - Authorization
+        - Content-Length
+        - Content-MD5
+        - Content-Type
+        - Date
+        - X-Auth-Token
+        - X-Requested-With
+        - X-Request-ID
+        - Cache-Control
+      exposed_headers:
+        - X-Auth-Token
+        - X-Request-ID
+        - X-RateLimit-Limit
+        - X-RateLimit-Remaining
+        - X-RateLimit-Reset
+      max_age: 86400
+      credentials: true
+      preflight_continue: false
+
+  - name: request-size-limiting
+    config:
+      allowed_payload_size: 10485760  # 10MB for file uploads
+
+  # Optimized Rate Limiting with Redis
+  - name: rate-limiting
+    config:
+      minute: 200               # Increased limits
+      hour: 2000                # Increased limits
+      day: 20000                # Increased limits
       policy: redis
       redis:
         host: host.docker.internal
-        port: 6379
-        timeout: 2000
-      limit_by: consumer
+        port: 6479
+        timeout: 1000           # Reduced timeout
+        database: 0
+      limit_by: ip
       fault_tolerant: true
-      hide_client_headers: false
+      hide_client_headers: true # Reduced header processing
+
+  # Response Caching for GET requests
+  - name: proxy-cache
+    config:
+      response_code:
+        - 200
+        - 301
+        - 404
+      request_method:
+        - GET
+        - HEAD
+      content_type:
+        - text/plain
+        - application/json
+        - text/css
+        - application/javascript
+        - text/html
+      cache_ttl: 300            # 5 minutes cache
+      strategy: memory
+
+  # Gzip Compression
+  - name: response-transformer
+    config:
+      add:
+        headers:
+          - "X-Powered-By: Kong Gateway"
+          - "X-Content-Type-Options: nosniff"
+          - "X-Frame-Options: DENY"
+          - "X-XSS-Protection: 1; mode=block"
+          - "Strict-Transport-Security: max-age=31536000; includeSubDomains"
+          - "Referrer-Policy: strict-origin-when-cross-origin"
+          - "Cache-Control: public, max-age=300" # Add caching headers
+      remove:
+        headers:
+          - Server
+
+  # Request ID for tracing (Simplified)
+  - name: correlation-id
+    config:
+      header_name: X-Request-ID
+      generator: uuid
+      echo_downstream: false    # Reduced processing
+
+# Route-specific Performance Plugins
+
+  # Authentication Service - Optimized Rate Limits
+  - name: rate-limiting
+    route: auth-public
+    config:
+      minute: 50                # Increased from 20
+      hour: 500                 # Increased from 200
+      day: 2000                 # Increased from 1000
+      policy: redis
+      redis:
+        host: host.docker.internal
+        port: 6479
+        timeout: 500            # Reduced timeout
+        database: 0
+      limit_by: ip
+      fault_tolerant: true
+      hide_client_headers: true
+
+  # Cache for profile endpoints
+  - name: proxy-cache
+    route: auth-protected
+    config:
+      response_code:
+        - 200
+      request_method:
+        - GET
+      cache_ttl: 60             # 1 minute cache for profiles
+      strategy: memory
+
+  - name: rate-limiting
+    route: auth-protected
+    config:
+      minute: 100               # Increased from 50
+      hour: 1000                # Increased from 500
+      day: 4000                 # Increased from 2000
+      policy: redis
+      redis:
+        host: host.docker.internal
+        port: 6479
+        timeout: 500
+        database: 0
+      limit_by: ip
+      fault_tolerant: true
+      hide_client_headers: true
+
+  - name: rate-limiting
+    route: auth-user-profile
+    config:
+      minute: 60                # Increased from 30
+      hour: 600                 # Increased from 300
+      day: 3000                 # Increased from 1500
+      policy: redis
+      redis:
+        host: host.docker.internal
+        port: 6479
+        timeout: 500
+        database: 0
+      limit_by: ip
+      fault_tolerant: true
+      hide_client_headers: true
+
+  # Admin Routes - Keep IP Restrictions but optimize
+  - name: ip-restriction
+    route: auth-admin
+    config:
+      allow:
+        - "10.0.0.0/8"
+        - "172.16.0.0/12"
+        - "192.168.0.0/16"
+        - "127.0.0.1"
+
+  - name: ip-restriction
+    route: auth-resources
+    config:
+      allow:
+        - "10.0.0.0/8"
+        - "172.16.0.0/12"
+        - "192.168.0.0/16"
+        - "127.0.0.1"
+
+  - name: ip-restriction
+    route: auth-roles
+    config:
+      allow:
+        - "10.0.0.0/8"
+        - "172.16.0.0/12"
+        - "192.168.0.0/16"
+        - "127.0.0.1"
+
+  # Asset Service - Optimized with Caching
+  - name: proxy-cache
+    service: asset-service
+    config:
+      response_code:
+        - 200
+      request_method:
+        - GET
+      cache_ttl: 180            # 3 minutes cache for asset data
+      strategy: memory
+
+  - name: rate-limiting
+    service: asset-service
+    config:
+      minute: 100               # Increased from 50
+      hour: 2000                # Increased from 1000
+      day: 10000                # Increased from 5000
+      policy: redis
+      redis:
+        host: host.docker.internal
+        port: 6479
+        timeout: 500
+        database: 0
+      limit_by: ip
+      fault_tolerant: true
+      hide_client_headers: true
+
+  # Asset Admin Routes - IP Restriction
+  - name: ip-restriction
+    route: asset-admin-group
+    config:
+      allow:
+        - "10.0.0.0/8"
+        - "172.16.0.0/12"
+        - "192.168.0.0/16"
+        - "127.0.0.1"
+
+  # Password Management Service - Optimized
+  - name: rate-limiting
+    service: password-management
+    config:
+      minute: 60                # Increased from 30
+      hour: 600                 # Increased from 300
+      day: 3000                 # Increased from 1500
+      policy: redis
+      redis:
+        host: host.docker.internal
+        port: 6479
+        timeout: 500
+        database: 0
+      limit_by: ip
+      fault_tolerant: true
+      hide_client_headers: true
+
+  # Keep security for password service
+  - name: ip-restriction
+    service: password-management
+    config:
+      allow:
+        - "10.0.0.0/8"
+        - "172.16.0.0/12"
+        - "192.168.0.0/16"
+        - "127.0.0.1"
+
+  # CDN Service - Aggressive Caching
+  - name: proxy-cache
+    route: cdn-public
+    config:
+      response_code:
+        - 200
+        - 304
+      request_method:
+        - GET
+        - HEAD
+      cache_ttl: 3600           # 1 hour cache for CDN content
+      strategy: memory
+      cache_control: true
+      ignore_uri_case: true
+
+  - name: rate-limiting
+    route: cdn-public
+    config:
+      minute: 500               # Increased from 200
+      hour: 5000                # Increased from 2000
+      day: 25000                # Increased from 10000
+      policy: redis
+      redis:
+        host: host.docker.internal
+        port: 6479
+        timeout: 500
+        database: 0
+      limit_by: ip
+      fault_tolerant: true
+      hide_client_headers: true
+
+  # CDN Service - Upload Routes (No caching for uploads)
+  - name: rate-limiting
+    route: cdn-upload
+    config:
+      minute: 20                # Increased from 10
+      hour: 200                 # Increased from 100
+      day: 1000                 # Increased from 500
+      policy: redis
+      redis:
+        host: host.docker.internal
+        port: 6479
+        timeout: 500
+        database: 0
+      limit_by: ip
+      fault_tolerant: true
+      hide_client_headers: true
+
+  - name: request-size-limiting
+    route: cdn-upload
+    config:
+      allowed_payload_size: 52428800  # 50MB for file uploads
+
+# Additional Performance Plugins
+
+  # Request Buffering for better performance
+  - name: request-transformer
+    config:
+      remove:
+        headers:
+          - "x-forwarded-proto"
+          - "x-forwarded-host"
+        querystring:
+          - "debug"
+          - "test"
+
+  # Response compression
+  - name: response-transformer
+    service: asset-service
+    config:
+      add:
+        headers:
+          - "Cache-Control: public, max-age=180"
+      remove:
+        headers:
+          - "Set-Cookie"
+
+  - name: response-transformer
+    route: auth-protected
+    config:
+      add:
+        headers:
+          - "Cache-Control: private, max-age=60"
+          
+  - name: zipkin
+    config:
+      http_endpoint: http://zipkin:9411/api/v2/spans
+      sample_ratio: 1.0
+      include_credential: false

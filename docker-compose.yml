@@ -1,7 +1,7 @@
-version: "3.7"
 services:
   kong:
     image: kong:latest
+    container_name: kong-gateway
     volumes:
       - ./kong.yml:/usr/local/kong/declarative/kong.yml
     environment:
@@ -11,12 +11,58 @@ services:
       - KONG_ADMIN_ACCESS_LOG=/dev/stdout
       - KONG_PROXY_ERROR_LOG=/dev/stderr
       - KONG_ADMIN_ERROR_LOG=/dev/stderr
-      - KONG_ADMIN_LISTEN=0.0.0.0:8001, 0.0.0.0:8444 ssl
-      - KONG_RATE_LIMITING_REDIS_HOST=host.docker.internal
-      - KONG_RATE_LIMITING_REDIS_PORT=6379
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001,0.0.0.0:8444 ssl
+      - KONG_RATE_LIMITING_REDIS_HOST=redis
+      - KONG_RATE_LIMITING_REDIS_PORT=6479
       - KONG_RATE_LIMITING_REDIS_TIMEOUT=2000
+
+      # ✅ Zipkin plugin enablement
+      - KONG_PLUGINS=zipkin,bundled
+      - KONG_TRACING=zipkin
+      - KONG_TRACING_SAMPLING_RATE=1.0
+      - KONG_ZIPKIN_HTTP_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - KONG_ZIPKIN_LOCAL_SERVICE_NAME=kong-gateway
+      - KONG_ZIPKIN_INCLUDE_CREDENTIAL=false
+
     ports:
       - "8000:8000"
       - "8443:8443"
       - "127.0.0.1:8001:8001"
       - "127.0.0.1:8444:8444"
+    depends_on:
+      - zipkin
+      - redis
+    networks:
+      - kong-net
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    environment:
+      - STORAGE_TYPE=mem
+      - JAVA_OPTS=-Xms512m -Xmx512m
+      - ZIPKIN_LOG_LEVEL=INFO
+    ports:
+      - "9411:9411"
+    networks:
+      - kong-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9411/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    command: ["redis-server", "--port", "6479"]
+    ports:
+      - "6479:6479"
+    networks:
+      - kong-net
+
+networks:
+  kong-net:
+    driver: bridge
