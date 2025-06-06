@@ -34,6 +34,7 @@ services:
       - redis
     networks:
       - kong-net
+    restart: always
 
   zipkin:
     image: openzipkin/zipkin:latest
@@ -62,6 +63,7 @@ services:
       - "6479:6479"
     networks:
       - kong-net
+    restart: always
 
 networks:
   kong-net:

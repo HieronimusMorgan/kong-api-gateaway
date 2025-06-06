@@ -18,8 +18,12 @@ services:
           - /v1/login-phone
           - /v1/change-device
           - /v1/verify-device
+          - /v1/forgot-password
+          - /v1/reset-redirect
+          - /v1/reset-password
         methods:
           - POST
+          - GET
         strip_path: false
         
       # Previously Protected Authentication Routes (Now Open)
