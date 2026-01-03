@@ -5,22 +5,26 @@ services:
   # Authentication Service
   - name: authentication-service
     url: http://host.docker.internal:8080
-    connect_timeout: 5000     # Reduced from 10000
-    write_timeout: 5000       # Reduced from 10000
-    read_timeout: 5000        # Reduced from 10000
-    retries: 2                # Reduced from 3
+    connect_timeout: 10000    # Reduced from 20000
+    write_timeout: 30000      # Reduced from 60000
+    read_timeout: 30000       # Reduced from 60000
+    retries: 0                # Reduced from 2
     routes:
       # Public Authentication Routes
       - name: auth-public
         paths:
           - /v1/register
           - /v1/login
+          - /v1/login/authorize
+          - /v1/login/verify
+          - /v1/login/token
           - /v1/login-phone
           - /v1/change-device
           - /v1/verify-device
           - /v1/forgot-password
           - /v1/reset-redirect
           - /v1/reset-password
+          - /v1/refresh-token
         methods:
           - POST
           - GET
@@ -32,11 +36,11 @@ services:
           - /v1/register-device-token
           - /v1/credential-key
           - /v1/verify-pin
+          - /v1/verify-biometric
           - /v1/change-password
           - /v1/change-pin
           - /v1/forget-pin
           - /v1/logout
-          - /v1/refresh-token
           - /v1/profile
         methods:
           - GET
@@ -50,6 +54,8 @@ services:
           - /v1/update/profile-name
           - /v1/update/profile-photo
           - /v1/update/user-setting
+          - /v1/update/biometric-authentication
+          - /v1/update/start_date_transaction
           - /v1/delete-user
         methods:
           - GET
@@ -98,10 +104,10 @@ services:
   # Asset Management Service
   - name: asset-service
     url: http://host.docker.internal:8081
-    connect_timeout: 8000     # Reduced from 15000
-    write_timeout: 15000      # Reduced from 30000
-    read_timeout: 15000       # Reduced from 30000
-    retries: 1                # Reduced from 2
+    connect_timeout: 10000    # Reduced from 20000
+    write_timeout: 30000      # Reduced from 60000
+    read_timeout: 30000       # Reduced from 60000
+    retries: 0                # Reduced from 2
     routes:
       # Asset Category Management
       - name: asset-category
@@ -245,6 +251,27 @@ services:
           - PUT
           - DELETE
         strip_path: false
+        
+      # Asset Dashboard Routes
+      - name: asset-dashboard
+        paths:
+          - /v1/asset-dashboard/complete
+          - /v1/asset-dashboard/overview-stats
+          - /v1/asset-dashboard/category-breakdown
+          - /v1/asset-dashboard/recent-assets
+          - /v1/asset-dashboard/attention-required
+          - /v1/asset-dashboard/maintenance-schedule
+          - /v1/asset-dashboard/monthly-trends
+          - /v1/asset-dashboard/top-assets
+          - /v1/asset-dashboard/wishlist-summary
+          - /v1/asset-dashboard/stock-alerts
+          - /v1/asset-dashboard/asset-group-summary
+          - /v1/asset-dashboard/financial-overview
+          - /v1/asset-dashboard/maintenance-cost-analysis
+          - /v1/asset-dashboard/asset-utilization
+        methods:
+          - GET
+        strip_path: false
     tags:
       - asset-management
       - business-service
@@ -252,15 +279,26 @@ services:
   # Password Management Service
   - name: password-management
     url: http://host.docker.internal:8082
-    connect_timeout: 5000     # Reduced from 10000
-    write_timeout: 5000       # Reduced from 10000
-    read_timeout: 5000        # Reduced from 10000
-    retries: 2                # Keep as is for security
+    connect_timeout: 10000    # Reduced from 20000
+    write_timeout: 30000      # Reduced from 60000
+    read_timeout: 30000       # Reduced from 60000
+    retries: 0                # Reduced from 2
     routes:
+      # Password Dashboard Management
+      - name: password-dashboard
+        paths:
+          - /v1/password-dashboard
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+
       # Password Entry Management
       - name: password-entry
         paths:
-          - /v1/entry
+          - /v1/password-entry
         methods:
           - GET
           - POST
@@ -271,7 +309,7 @@ services:
       # Password Group Management
       - name: password-group
         paths:
-          - /v1/group
+          - /v1/password-group
         methods:
           - GET
           - POST
@@ -282,7 +320,18 @@ services:
       # Password Tag Management
       - name: password-tag
         paths:
-          - /v1/tag
+          - /v1/password-tag
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+
+      # Password Shared Management
+      - name: password-shared
+        paths:
+          - /v1/password-shared
         methods:
           - GET
           - POST
@@ -293,13 +342,31 @@ services:
       - password-management
       - security-service
 
+  # Financial Service
+  - name: financial-service-v1
+    url: http://host.docker.internal:8084/v1
+    connect_timeout: 10000
+    write_timeout: 30000
+    read_timeout: 30000
+    retries: 0
+    routes:
+      - name: financial-api
+        paths:
+          - /financial/v1
+        methods: [GET, POST, PUT, DELETE, PATCH]
+        strip_path: true
+        path_handling: v1
+    tags:
+      - financial-service
+      - business-service
+
   # CDN Service
   - name: cdn-service
     url: http://host.docker.internal:8181
     connect_timeout: 10000    # Reduced from 20000
     write_timeout: 30000      # Reduced from 60000
     read_timeout: 30000       # Reduced from 60000
-    retries: 1                # Reduced from 2
+    retries: 0                # Reduced from 2
     routes:
       # Public CDN Access
       - name: cdn-public
@@ -541,6 +608,33 @@ plugins:
       fault_tolerant: true
       hide_client_headers: true
 
+  # Asset Dashboard - Optimized Caching for Dashboard Data
+  - name: proxy-cache
+    route: asset-dashboard
+    config:
+      response_code:
+        - 200
+      request_method:
+        - GET
+      cache_ttl: 120            # 2 minutes cache for dashboard data (shorter due to real-time nature)
+      strategy: memory
+
+  - name: rate-limiting
+    route: asset-dashboard
+    config:
+      minute: 120               # Higher limits for dashboard endpoints
+      hour: 1200
+      day: 6000
+      policy: redis
+      redis:
+        host: host.docker.internal
+        port: 6479
+        timeout: 500
+        database: 0
+      limit_by: ip
+      fault_tolerant: true
+      hide_client_headers: true
+
   # Asset Admin Routes - IP Restriction
   - name: ip-restriction
     route: asset-admin-group
@@ -667,3 +761,5 @@ plugins:
       http_endpoint: http://zipkin:9411/api/v2/spans
       sample_ratio: 1.0
       include_credential: false
+
+# in financial service, i want the kong hit /financial/v1 blablabla
