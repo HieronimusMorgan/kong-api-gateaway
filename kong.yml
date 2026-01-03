@@ -531,13 +531,6 @@ plugins:
         headers:
           - Server
 
-  # Request ID for tracing (Simplified)
-  - name: correlation-id
-    config:
-      header_name: X-Request-ID
-      generator: uuid
-      echo_downstream: false    # Reduced processing
-
 # Route-specific Performance Plugins
 
   # Authentication Service - Optimized Rate Limits
@@ -774,17 +767,6 @@ plugins:
 
 # Additional Performance Plugins
 
-  # Request Buffering for better performance
-  - name: request-transformer
-    config:
-      remove:
-        headers:
-          - "x-forwarded-proto"
-          - "x-forwarded-host"
-        querystring:
-          - "debug"
-          - "test"
-
   # Response compression
   - name: response-transformer
     service: asset-service
@@ -806,7 +788,5 @@ plugins:
   - name: zipkin
     config:
       http_endpoint: http://zipkin:9411/api/v2/spans
-      sample_ratio: 0.05
+      sample_ratio: 0.01
       include_credential: false
-
-# in financial service, i want the kong hit /financial/v1 blablabla
