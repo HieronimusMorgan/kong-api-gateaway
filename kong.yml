@@ -13,6 +13,18 @@ services:
       # Public Authentication Routes
       - name: auth-public
         paths:
+          - /authentication/v1/register
+          - /authentication/v1/login
+          - /authentication/v1/login/authorize
+          - /authentication/v1/login/verify
+          - /authentication/v1/login/token
+          - /authentication/v1/login-phone
+          - /authentication/v1/change-device
+          - /authentication/v1/verify-device
+          - /authentication/v1/forgot-password
+          - /authentication/v1/reset-redirect
+          - /authentication/v1/reset-password
+          - /authentication/v1/refresh-token
           - /v1/register
           - /v1/login
           - /v1/login/authorize
@@ -33,6 +45,15 @@ services:
       # Previously Protected Authentication Routes (Now Open)
       - name: auth-protected
         paths:
+          - /authentication/v1/register-device-token
+          - /authentication/v1/credential-key
+          - /authentication/v1/verify-pin
+          - /authentication/v1/verify-biometric
+          - /authentication/v1/change-password
+          - /authentication/v1/change-pin
+          - /authentication/v1/forget-pin
+          - /authentication/v1/logout
+          - /authentication/v1/profile
           - /v1/register-device-token
           - /v1/credential-key
           - /v1/verify-pin
@@ -51,6 +72,12 @@ services:
       # User Profile Management
       - name: auth-user-profile
         paths:
+          - /authentication/v1/update/profile-name
+          - /authentication/v1/update/profile-photo
+          - /authentication/v1/update/user-setting
+          - /authentication/v1/update/biometric-authentication
+          - /authentication/v1/update/start_date_transaction
+          - /authentication/v1/delete-user
           - /v1/update/profile-name
           - /v1/update/profile-photo
           - /v1/update/user-setting
@@ -67,6 +94,8 @@ services:
       # Admin Authentication Routes
       - name: auth-admin
         paths:
+          - /authentication/v1/users
+          - /authentication/v1/user/update-role
           - /v1/users
           - /v1/user/update-role
         methods:
@@ -79,6 +108,7 @@ services:
       # Resource Management (Admin)
       - name: auth-resources
         paths:
+          - /authentication/v1/resources
           - /v1/resources
         methods:
           - GET
@@ -90,6 +120,7 @@ services:
       # Role Management (Admin)
       - name: auth-roles
         paths:
+          - /authentication/v1/role
           - /v1/role
         methods:
           - GET
@@ -112,6 +143,7 @@ services:
       # Asset Category Management
       - name: asset-category
         paths:
+          - /asset/v1/asset-category
           - /v1/asset-category
         methods:
           - GET
@@ -123,6 +155,7 @@ services:
       # Asset Group Management
       - name: asset-group
         paths:
+          - /asset/v1/asset-group
           - /v1/asset-group
         methods:
           - GET
@@ -134,6 +167,7 @@ services:
       # Asset Group Assets
       - name: asset-group-asset
         paths:
+          - /asset/v1/asset-group/asset
           - /v1/asset-group/asset
         methods:
           - GET
@@ -145,6 +179,7 @@ services:
       # Asset Group Permissions
       - name: asset-group-permission
         paths:
+          - /asset/v1/asset-group/permission
           - /v1/asset-group/permission
         methods:
           - GET
@@ -156,6 +191,7 @@ services:
       # Asset Group Members
       - name: asset-group-member
         paths:
+          - /asset/v1/asset-group/member
           - /v1/asset-group/member
         methods:
           - GET
@@ -167,6 +203,7 @@ services:
       # Asset Group Invitations
       - name: asset-group-invitation
         paths:
+          - /asset/v1/asset-group/invitation
           - /v1/asset-group/invitation
         methods:
           - GET
@@ -178,6 +215,7 @@ services:
       # Admin Asset Group Management
       - name: asset-admin-group
         paths:
+          - /asset/v1/admin/asset-group
           - /v1/admin/asset-group
         methods:
           - GET
@@ -189,6 +227,7 @@ services:
       # Asset Maintenance Records
       - name: asset-maintenance-record
         paths:
+          - /asset/v1/asset-maintenance-record
           - /v1/asset-maintenance-record
         methods:
           - GET
@@ -200,6 +239,7 @@ services:
       # Asset Maintenance
       - name: asset-maintenance
         paths:
+          - /asset/v1/asset-maintenance
           - /v1/asset-maintenance
         methods:
           - GET
@@ -211,6 +251,7 @@ services:
       # Asset Maintenance Types
       - name: asset-maintenance-type
         paths:
+          - /asset/v1/asset-maintenance-type
           - /v1/asset-maintenance-type
         methods:
           - GET
@@ -222,6 +263,7 @@ services:
       # Asset Management
       - name: asset-management
         paths:
+          - /asset/v1/asset
           - /v1/asset
         methods:
           - GET
@@ -233,6 +275,7 @@ services:
       # Asset Status
       - name: asset-status
         paths:
+          - /asset/v1/asset-status
           - /v1/asset-status
           - /assets-service/v1/assets/status
         methods:
@@ -244,6 +287,7 @@ services:
       # Asset Wishlist
       - name: asset-wishlist
         paths:
+          - /asset/v1/asset-wishlist
           - /v1/asset-wishlist
         methods:
           - GET
@@ -255,6 +299,20 @@ services:
       # Asset Dashboard Routes
       - name: asset-dashboard
         paths:
+          - /asset/v1/asset-dashboard/complete
+          - /asset/v1/asset-dashboard/overview-stats
+          - /asset/v1/asset-dashboard/category-breakdown
+          - /asset/v1/asset-dashboard/recent-assets
+          - /asset/v1/asset-dashboard/attention-required
+          - /asset/v1/asset-dashboard/maintenance-schedule
+          - /asset/v1/asset-dashboard/monthly-trends
+          - /asset/v1/asset-dashboard/top-assets
+          - /asset/v1/asset-dashboard/wishlist-summary
+          - /asset/v1/asset-dashboard/stock-alerts
+          - /asset/v1/asset-dashboard/asset-group-summary
+          - /asset/v1/asset-dashboard/financial-overview
+          - /asset/v1/asset-dashboard/maintenance-cost-analysis
+          - /asset/v1/asset-dashboard/asset-utilization
           - /v1/asset-dashboard/complete
           - /v1/asset-dashboard/overview-stats
           - /v1/asset-dashboard/category-breakdown
@@ -287,6 +345,7 @@ services:
       # Password Dashboard Management
       - name: password-dashboard
         paths:
+          - /password/v1/password-dashboard
           - /v1/password-dashboard
         methods:
           - GET
@@ -298,6 +357,7 @@ services:
       # Password Entry Management
       - name: password-entry
         paths:
+          - /password/v1/password-entry
           - /v1/password-entry
         methods:
           - GET
@@ -309,6 +369,7 @@ services:
       # Password Group Management
       - name: password-group
         paths:
+          - /password/v1/password-group
           - /v1/password-group
         methods:
           - GET
@@ -320,6 +381,7 @@ services:
       # Password Tag Management
       - name: password-tag
         paths:
+          - /password/v1/password-tag
           - /v1/password-tag
         methods:
           - GET
@@ -331,6 +393,7 @@ services:
       # Password Shared Management
       - name: password-shared
         paths:
+          - /password/v1/password-shared
           - /v1/password-shared
         methods:
           - GET
@@ -371,6 +434,7 @@ services:
       # Public CDN Access
       - name: cdn-public
         paths:
+          - /cdn/v1/cdn
           - /v1/cdn
         methods:
           - GET
@@ -379,6 +443,8 @@ services:
       # File Upload
       - name: cdn-upload
         paths:
+          - /cdn/v1/upload-photo-profile
+          - /cdn/v1/upload
           - /v1/upload-photo-profile
           - /v1/upload
         methods:
@@ -448,25 +514,6 @@ plugins:
       limit_by: ip
       fault_tolerant: true
       hide_client_headers: true # Reduced header processing
-
-  # Response Caching for GET requests
-  - name: proxy-cache
-    config:
-      response_code:
-        - 200
-        - 301
-        - 404
-      request_method:
-        - GET
-        - HEAD
-      content_type:
-        - text/plain
-        - application/json
-        - text/css
-        - application/javascript
-        - text/html
-      cache_ttl: 300            # 5 minutes cache
-      strategy: memory
 
   # Gzip Compression
   - name: response-transformer
@@ -759,7 +806,7 @@ plugins:
   - name: zipkin
     config:
       http_endpoint: http://zipkin:9411/api/v2/spans
-      sample_ratio: 1.0
+      sample_ratio: 0.05
       include_credential: false
 
 # in financial service, i want the kong hit /financial/v1 blablabla
